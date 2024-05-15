@@ -1,5 +1,7 @@
-﻿using Application.DTO.Request.Identity;
+﻿using Application.DTO.Request.ActivityTracker;
+using Application.DTO.Request.Identity;
 using Application.DTO.Response;
+using Application.DTO.Response.ActivityTracker;
 using Application.DTO.Response.Identity;
 
 namespace Application.Interface.Identity;
@@ -16,7 +18,7 @@ public interface IAccount
 
     Task<ServiceResponse> UpdateUserAsync(ChangeUserClaimRequestDTO model);
 
-    //Task ServiceActivityAsync(ActivityTrackerRequestDTO model);
+    Task ServiceActivityAsync(ActivityTrackerRequestDTO model);
 
-    //Task<IEnumerable<ActivityTrackerResponseDTO>> GetActivitiesAsync();
+    Task<IEnumerable<ActivityTrackerResponseDTO>> GetActivitiesAsync();
 }

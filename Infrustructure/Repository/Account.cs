@@ -1,9 +1,13 @@
-﻿using Application.DTO.Request.Identity;
+﻿using Application.DTO.Request.ActivityTracker;
+using Application.DTO.Request.Identity;
 using Application.DTO.Response;
+using Application.DTO.Response.ActivityTracker;
 using Application.DTO.Response.Identity;
 using Application.Extensions.Identity;
 using Application.Interface.Identity;
+using Domain.Entittes.ActivityTracker;
 using Infrustructure.DataAccess;
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -15,6 +19,7 @@ public class Account(UserManager<ApplicationUser> userManager,
                      SignInManager<ApplicationUser> signInManager,
                      AppDbContext context) : IAccount
 {
+
     public async Task<ServiceResponse> CreateUserAsync(CreateUserRequestDTO model)
     {
 
@@ -158,6 +163,28 @@ public class Account(UserManager<ApplicationUser> userManager,
 
     }
 
+    public async Task ServiceActivityAsync(ActivityTrackerRequestDTO model)
+    {
+        context.ActivityTracker.Add(model.Adapt(new Tracker()));
+
+        await context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<ActivityTrackerResponseDTO>> GetActivitiesAsync()
+    {
+        var activityList = new List<ActivityTrackerResponseDTO>();
+
+        var data = (await context.ActivityTracker.ToListAsync()).Adapt<List<ActivityTrackerResponseDTO>> ();
+
+        data.ForEach(async activity =>
+        {
+            activity.Username = (await FindUserById(activity.UserId)).Name;
+            activityList.Add(activity);
+        });
+
+        return data;
+    }
+
     private async Task<ServiceResponse> CreateUserClaims(CreateUserRequestDTO model)
     {
         if (string.IsNullOrEmpty(model.Policy))
@@ -241,5 +268,6 @@ public class Account(UserManager<ApplicationUser> userManager,
     private async Task<ApplicationUser> FindUserByEmail(string email) => await userManager.FindByEmailAsync(email);
 
     private async Task<ApplicationUser> FindUserById(string userId) => await userManager.FindByIdAsync(userId);
+
 
 }
