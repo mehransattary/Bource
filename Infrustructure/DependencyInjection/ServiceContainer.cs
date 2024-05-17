@@ -2,6 +2,7 @@
 using Application.Interface.Identity;
 using Infrustructure.DataAccess;
 using Infrustructure.Repository;
+using Infrustructure.Repository.Bources.Nomad.Handler;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +41,9 @@ public static class ServiceContainer
             });
         services.AddCascadingAuthenticationState();
         services.AddScoped<IAccount, Account>();
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateNomadHandler).Assembly));
+        services.AddScoped<DataAccess.IDbContextFactory<AppDbContext>, DbContextFactory<AppDbContext>>();
+
         return services;
 
     }
